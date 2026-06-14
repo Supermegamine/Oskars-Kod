@@ -61,6 +61,24 @@ export function formatDateRange(startStr: string, endStr: string) {
   return `${startPart} – ${endPart}`;
 }
 
+export function getDaysInRange(startStr: string, endStr: string): string[] {
+  const start = parseDate(startStr);
+  const end = parseDate(endStr);
+  const days: string[] = [];
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    days.push(toDateStr(d));
+  }
+  return days;
+}
+
+export function formatAgendaDate(dateStr: string) {
+  return parseDate(dateStr).toLocaleDateString(undefined, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  });
+}
+
 export function getMonthsInRange(startStr: string, endStr: string) {
   const start = parseDate(startStr);
   const end = parseDate(endStr);

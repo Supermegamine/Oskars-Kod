@@ -38,10 +38,10 @@ export default function HolidayForm({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+        className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-t-2xl bg-white p-6 shadow-xl sm:rounded-2xl"
       >
         <h2 className="text-lg font-semibold text-zinc-900">
           {holiday ? "Edit holiday" : "Add holiday"}
@@ -59,7 +59,7 @@ export default function HolidayForm({
           />
         </label>
 
-        <div className="mt-3 flex gap-3">
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row">
           <label className="flex-1 text-sm font-medium text-zinc-700">
             Start date
             <input

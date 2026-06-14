@@ -9,6 +9,7 @@ import { formatDateRange, getMonthsInRange } from "@/lib/date";
 import { useStoredName } from "../../components/NamePrompt";
 import NamePrompt from "../../components/NamePrompt";
 import CalendarMonth from "../../components/CalendarMonth";
+import AgendaView from "../../components/AgendaView";
 import DayDetailModal from "../../components/DayDetailModal";
 import ActivityForm from "../../components/ActivityForm";
 
@@ -139,7 +140,16 @@ export default function HolidayPage() {
       </header>
 
       <main className="flex-1 px-4 py-4">
-        <div className="flex flex-col gap-6">
+        <div className="sm:hidden">
+          <AgendaView
+            rangeStart={holiday.start_date}
+            rangeEnd={holiday.end_date}
+            activitiesByDate={activitiesByDate}
+            onDayClick={(dateStr) => setSelectedDate(dateStr)}
+          />
+        </div>
+
+        <div className="hidden flex-col gap-6 sm:flex">
           {months.map(({ year, month }) => (
             <CalendarMonth
               key={`${year}-${month}`}

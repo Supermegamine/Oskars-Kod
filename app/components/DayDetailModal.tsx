@@ -20,8 +20,8 @@ export default function DayDetailModal({
   onAddNew: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-4">
+      <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-t-2xl bg-white p-6 shadow-xl sm:rounded-2xl">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-zinc-900">
             {formatDateHeading(date)}
