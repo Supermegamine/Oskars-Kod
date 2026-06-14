@@ -111,6 +111,13 @@ export default function HolidayPage() {
     }
     activitiesByDate.get(activity.activity_date)!.push(activity);
   }
+  for (const dayActivities of activitiesByDate.values()) {
+    dayActivities.sort((a, b) => {
+      if (!a.activity_time) return 1;
+      if (!b.activity_time) return -1;
+      return a.activity_time.localeCompare(b.activity_time);
+    });
+  }
 
   const months = getMonthsInRange(holiday.start_date, holiday.end_date);
   const selectedActivities = selectedDate

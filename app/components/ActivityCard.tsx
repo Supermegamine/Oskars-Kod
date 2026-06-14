@@ -2,6 +2,7 @@
 
 import type { Activity } from "@/lib/types";
 import { formatTime } from "@/lib/date";
+import { getActivityColor } from "@/lib/colors";
 
 export default function ActivityCard({
   activity,
@@ -13,9 +14,12 @@ export default function ActivityCard({
   onDelete: () => void;
 }) {
   const time = formatTime(activity.activity_time);
+  const color = getActivityColor(activity);
 
   return (
-    <div className="flex items-start justify-between gap-3 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+    <div
+      className={`flex items-start justify-between gap-3 rounded-xl border border-zinc-200 border-l-4 bg-white p-4 shadow-sm ${color.accent}`}
+    >
       <div className="min-w-0">
         <div className="flex items-baseline gap-2">
           {time && (
