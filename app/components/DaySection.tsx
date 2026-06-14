@@ -1,16 +1,8 @@
 "use client";
 
 import type { Activity } from "@/lib/types";
+import { formatDateHeading } from "@/lib/date";
 import ActivityCard from "./ActivityCard";
-
-function formatDateHeading(dateStr: string) {
-  const date = new Date(`${dateStr}T00:00:00`);
-  return date.toLocaleDateString(undefined, {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
-}
 
 export default function DaySection({
   date,

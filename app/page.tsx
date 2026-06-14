@@ -2,64 +2,59 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import type { Activity, ActivityInput } from "@/lib/types";
+import type { Holiday, HolidayInput } from "@/lib/types";
 import NamePrompt, { useStoredName } from "./components/NamePrompt";
-import ActivityForm from "./components/ActivityForm";
-import DaySection from "./components/DaySection";
+import HolidayForm from "./components/HolidayForm";
+import HolidayCard from "./components/HolidayCard";
 
 export default function Home() {
   const { name, saveName, loaded } = useStoredName();
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingActivity, setEditingActivity] = useState<Activity | "new" | null>(
+  const [editingHoliday, setEditingHoliday] = useState<Holiday | "new" | null>(
     null
   );
 
   useEffect(() => {
-    loadActivities();
+    loadHolidays();
   }, []);
 
-  async function loadActivities() {
+  async function loadHolidays() {
     setLoading(true);
     const { data, error } = await supabase
-      .from("activities")
+      .from("holidays")
       .select("*")
-      .order("activity_date", { ascending: true, nullsFirst: false })
-      .order("activity_time", { ascending: true, nullsFirst: false });
+      .order("start_date", { ascending: true });
 
     if (!error && data) {
-      setActivities(data as Activity[]);
+      setHolidays(data as Holiday[]);
     }
     setLoading(false);
   }
 
-  async function handleSave(input: ActivityInput) {
+  async function handleSave(input: HolidayInput) {
     const payload = {
       title: input.title,
-      description: input.description || null,
-      activity_date: input.activity_date || null,
-      activity_time: input.activity_time || null,
-      location: input.location || null,
+      start_date: input.start_date,
+      end_date: input.end_date,
       added_by: input.added_by,
     };
 
-    if (editingActivity && editingActivity !== "new") {
-      await supabase.from("activities").update(payload).eq("id", editingActivity.id);
+    if (editingHoliday && editingHoliday !== "new") {
+      await supabase.from("holidays").update(payload).eq("id", editingHoliday.id);
     } else {
-      await supabase.from("activities").insert(payload);
+      await supabase.from("holidays").insert(payload);
     }
 
-    setEditingActivity(null);
-    await loadActivities();
+    setEditingHoliday(null);
+    await loadHolidays();
   }
 
-  async function handleDelete(activity: Activity) {
-    if (!confirm(`Delete "${activity.title}"?`)) return;
-    await supabase.from("activities").delete().eq("id", activity.id);
-    await loadActivities();
+  async function handleDelete(holiday: Holiday) {
+    if (!confirm(`Delete "${holiday.title}"?`)) return;
+    await supabase.from("holidays").delete().eq("id", holiday.id);
+    await loadHolidays();
   }
-
-  const groups = groupByDate(activities);
 
   if (!loaded) return null;
 
@@ -76,19 +71,18 @@ export default function Home() {
       <main className="flex-1 px-4 py-4">
         {loading ? (
           <p className="text-center text-zinc-500">Loading...</p>
-        ) : groups.length === 0 ? (
+        ) : holidays.length === 0 ? (
           <p className="text-center text-zinc-500">
-            No activities yet. Add the first one!
+            No holidays yet. Add the first one!
           </p>
         ) : (
-          <div className="flex flex-col gap-6">
-            {groups.map(([date, items]) => (
-              <DaySection
-                key={date ?? "unscheduled"}
-                date={date}
-                activities={items}
-                onEdit={(activity) => setEditingActivity(activity)}
-                onDelete={handleDelete}
+          <div className="flex flex-col gap-3">
+            {holidays.map((holiday) => (
+              <HolidayCard
+                key={holiday.id}
+                holiday={holiday}
+                onEdit={() => setEditingHoliday(holiday)}
+                onDelete={() => handleDelete(holiday)}
               />
             ))}
           </div>
@@ -96,37 +90,21 @@ export default function Home() {
       </main>
 
       <button
-        onClick={() => setEditingActivity("new")}
+        onClick={() => setEditingHoliday("new")}
         className="fixed bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-zinc-900 text-2xl text-white shadow-lg"
-        aria-label="Add activity"
+        aria-label="Add holiday"
       >
         +
       </button>
 
-      {editingActivity && name && (
-        <ActivityForm
-          activity={editingActivity === "new" ? undefined : editingActivity}
+      {editingHoliday && name && (
+        <HolidayForm
+          holiday={editingHoliday === "new" ? undefined : editingHoliday}
           defaultName={name}
           onSave={handleSave}
-          onCancel={() => setEditingActivity(null)}
+          onCancel={() => setEditingHoliday(null)}
         />
       )}
     </div>
   );
-}
-
-function groupByDate(activities: Activity[]): [string | null, Activity[]][] {
-  const map = new Map<string | null, Activity[]>();
-  for (const activity of activities) {
-    const key = activity.activity_date;
-    if (!map.has(key)) map.set(key, []);
-    map.get(key)!.push(activity);
-  }
-
-  // Sort so unscheduled (null) appears last
-  return Array.from(map.entries()).sort((a, b) => {
-    if (a[0] === null) return 1;
-    if (b[0] === null) return -1;
-    return a[0].localeCompare(b[0]);
-  });
 }

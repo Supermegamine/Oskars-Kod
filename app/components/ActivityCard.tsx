@@ -1,12 +1,7 @@
 "use client";
 
 import type { Activity } from "@/lib/types";
-
-function formatTime(time: string | null) {
-  if (!time) return null;
-  const [hours, minutes] = time.split(":");
-  return `${hours}:${minutes}`;
-}
+import { formatTime } from "@/lib/date";
 
 export default function ActivityCard({
   activity,

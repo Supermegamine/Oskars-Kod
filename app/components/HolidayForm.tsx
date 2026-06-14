@@ -1,45 +1,36 @@
 "use client";
 
 import { useState } from "react";
-import type { Activity, ActivityInput } from "@/lib/types";
+import type { Holiday, HolidayInput } from "@/lib/types";
 
-export default function ActivityForm({
-  activity,
+export default function HolidayForm({
+  holiday,
   defaultName,
-  holidayId,
-  initialDate,
   onSave,
   onCancel,
 }: {
-  activity?: Activity;
+  holiday?: Holiday;
   defaultName: string;
-  holidayId: string;
-  initialDate?: string;
-  onSave: (input: ActivityInput) => Promise<void>;
+  onSave: (input: HolidayInput) => Promise<void>;
   onCancel: () => void;
 }) {
-  const [title, setTitle] = useState(activity?.title ?? "");
-  const [description, setDescription] = useState(activity?.description ?? "");
-  const [activityDate, setActivityDate] = useState(
-    activity?.activity_date ?? initialDate ?? ""
-  );
-  const [activityTime, setActivityTime] = useState(activity?.activity_time ?? "");
-  const [location, setLocation] = useState(activity?.location ?? "");
+  const [title, setTitle] = useState(holiday?.title ?? "");
+  const [startDate, setStartDate] = useState(holiday?.start_date ?? "");
+  const [endDate, setEndDate] = useState(holiday?.end_date ?? "");
   const [saving, setSaving] = useState(false);
+
+  const invalidRange = Boolean(startDate && endDate && endDate < startDate);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim() || !startDate || !endDate || invalidRange) return;
     setSaving(true);
     try {
       await onSave({
         title: title.trim(),
-        description: description.trim(),
-        activity_date: activityDate,
-        activity_time: activityTime,
-        location: location.trim(),
-        added_by: activity?.added_by ?? defaultName,
-        holiday_id: activity?.holiday_id ?? holidayId,
+        start_date: startDate,
+        end_date: endDate,
+        added_by: holiday?.added_by ?? defaultName,
       });
     } finally {
       setSaving(false);
@@ -53,7 +44,7 @@ export default function ActivityForm({
         className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
       >
         <h2 className="text-lg font-semibold text-zinc-900">
-          {activity ? "Edit activity" : "Add activity"}
+          {holiday ? "Edit holiday" : "Add holiday"}
         </h2>
 
         <label className="mt-4 block text-sm font-medium text-zinc-700">
@@ -63,52 +54,39 @@ export default function ActivityForm({
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Visit the beach"
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-base focus:border-zinc-500 focus:outline-none"
-          />
-        </label>
-
-        <label className="mt-3 block text-sm font-medium text-zinc-700">
-          Description
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Any details..."
-            rows={2}
+            placeholder="e.g. Summer in Greece"
             className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-base focus:border-zinc-500 focus:outline-none"
           />
         </label>
 
         <div className="mt-3 flex gap-3">
           <label className="flex-1 text-sm font-medium text-zinc-700">
-            Date
+            Start date
             <input
               type="date"
-              value={activityDate}
-              onChange={(e) => setActivityDate(e.target.value)}
+              required
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
               className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-base focus:border-zinc-500 focus:outline-none"
             />
           </label>
           <label className="flex-1 text-sm font-medium text-zinc-700">
-            Time
+            End date
             <input
-              type="time"
-              value={activityTime}
-              onChange={(e) => setActivityTime(e.target.value)}
+              type="date"
+              required
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
               className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-base focus:border-zinc-500 focus:outline-none"
             />
           </label>
         </div>
 
-        <label className="mt-3 block text-sm font-medium text-zinc-700">
-          Location
-          <input
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="e.g. Harbour front"
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-base focus:border-zinc-500 focus:outline-none"
-          />
-        </label>
+        {invalidRange && (
+          <p className="mt-2 text-sm text-red-600">
+            End date must be on or after the start date.
+          </p>
+        )}
 
         <div className="mt-5 flex gap-3">
           <button
@@ -120,7 +98,7 @@ export default function ActivityForm({
           </button>
           <button
             type="submit"
-            disabled={!title.trim() || saving}
+            disabled={!title.trim() || !startDate || !endDate || invalidRange || saving}
             className="flex-1 rounded-lg bg-zinc-900 px-4 py-2 font-medium text-white disabled:opacity-40"
           >
             {saving ? "Saving..." : "Save"}
