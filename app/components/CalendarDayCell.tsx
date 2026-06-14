@@ -4,7 +4,7 @@ import type { Activity } from "@/lib/types";
 import { formatTime } from "@/lib/date";
 import { getActivityColor } from "@/lib/colors";
 
-const MAX_VISIBLE_CHIPS = 3;
+const MAX_VISIBLE_CHIPS = 5;
 
 export default function CalendarDayCell({
   date,
@@ -27,7 +27,7 @@ export default function CalendarDayCell({
     <div
       onClick={inRange ? onClick : undefined}
       className={`flex flex-col gap-1 border border-zinc-200 p-1.5 ${
-        inRange ? "min-h-[110px] cursor-pointer bg-white hover:bg-zinc-100" : "min-h-[60px] bg-zinc-50"
+        inRange ? "min-h-[180px] cursor-pointer bg-white hover:bg-zinc-100" : "min-h-[60px] bg-zinc-50"
       }`}
     >
       <span
@@ -47,7 +47,7 @@ export default function CalendarDayCell({
           return (
             <span
               key={activity.id}
-              className={`truncate rounded px-1 py-0.5 text-[11px] leading-tight ${getActivityColor(activity).chip}`}
+              className={`truncate rounded px-1.5 py-1 text-xs leading-tight ${getActivityColor(activity).chip}`}
               title={activity.title}
             >
               {time ? `${time} ` : ""}
